@@ -1,0 +1,16 @@
+{
+  "DC01": [
+    "cass01.dc01.cassandranodes.com",
+    "cass02.dc01.cassandranodes.com",
+    "cass03.dc01.cassandranodes.com",
+    "cass04.dc01.cassandranodes.com",
+    "cass05.dc01.cassandranodes.com"
+  ],
+  "DC02": [
+    "cass01.dc02.cassandranodes.com",
+    "cass02.dc02.cassandranodes.com",
+    "cass03.dc02.cassandranodes.com",
+    "cass04.dc02.cassandranodes.com",
+    "cass05.dc02.cassandranodes.com"
+  ]
+}
