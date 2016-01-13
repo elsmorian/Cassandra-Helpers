@@ -8,9 +8,10 @@ import getpass
 
 from fabric.api import run, sudo, execute, task, env, hosts, parallel
 from fabric.operations import prompt
+from fabric.context_managers import settings
 from fabric.state import output
 from fabric.utils import abort
-from fabric.colors import green, white, yellow
+from fabric.colors import green, white, yellow, red
 from fabric.network import ssh
 
 CASSANDRA_CLUSTER_DETAILS = 'cassandra_cluster_details.json'
@@ -100,7 +101,8 @@ def _flush_memtables():
 
 def _drain_cassandra_node():
     """Drains a Cassandra node."""
-    result = run('nodetool drain')
+    with settings(warn_only=True):
+        result = run('nodetool drain')
     status = red(result.failed) if result.failed else green(not result.failed)
     node_print("Drained:", status)
 
@@ -149,11 +151,19 @@ def show_cluster_load():
     print "\n"
 
 @task
-def show_cluster_streaming_throughput():
+def show_cluster_streaming_throughput_limit():
     """Show the streaming throughput limit for each Cassandra node."""
     print "\n"
     print white("Streaming throughput Limit:")
     execute(_print_cassandra_stream_throughput, hosts=get_all_cassandra_nodes())
+    print "\n"
+
+@task
+def show_cluster_compaction_throughput_limit():
+    """Show the compaction throughput limit for each Cassandra node."""
+    print "\n"
+    print white("Compaction throughput Limit:")
+    execute(_print_cassandra_compaction_throughput, hosts=get_all_cassandra_nodes())
     print "\n"
 
 @task
@@ -192,48 +202,48 @@ def enable_auto_compactions(keyspace=None):
     print "\n"
 
 @task
-def set_streaming_throughput(limit=200):
+def set_streaming_throughput_limit(limit=200):
     """Sets the streaming throughput limit across the Cassandra cluster."""
     print "\n"
     print white("Setting streaming throughput limit to {}:".format(limit))
     execute(
-        _enable_stream_throughput_limit,
+        _set_stream_throughput_limit,
         limit=limit,
         hosts=get_all_cassandra_nodes(),
     )
     print "\n"
 
 @task
-def disable_streaming_throughput():
+def disable_streaming_throughput_limit():
     """Disable the streaming throughput limit across the Cassandra cluster."""
     print "\n"
     print white("Disabling streaming throughput limit:")
     execute(
-        _enable_stream_throughput_limit,
+        _set_stream_throughput_limit,
         limit=0,
         hosts=get_all_cassandra_nodes(),
     )
     print "\n"
 
 @task
-def set_compaction_throughput(limit=64):
+def set_compaction_throughput_limit(limit=64):
     """Sets the compaction throughput limit across the Cassandra cluster."""
     print "\n"
     print white("Setting compaction throughput limit to {}:".format(limit))
     execute(
-        _enable_compaction_throughput_limit,
+        _set_compaction_throughput_limit,
         limit=limit,
         hosts=get_all_cassandra_nodes(),
     )
     print "\n"
 
 @task
-def disable_compaction_throughput():
+def disable_compaction_throughput_limit():
     """Disable the compaction throughput limit across the Cassandra cluster."""
     print "\n"
     print white("Disabling compaction throughput limit:")
     execute(
-        _enable_compaction_throughput_limit,
+        _set_compaction_throughput_limit,
         limit=0,
         hosts=get_all_cassandra_nodes(),
     )
