@@ -103,7 +103,8 @@ def _drain_cassandra_node():
     """Drains a Cassandra node."""
     with settings(warn_only=True):
         result = run('nodetool drain')
-    status = red(result.failed) if result.failed else green(not result.failed)
+    sucess = not result.failed
+    status = green(sucess) if sucess else red(sucess)
     node_print("Drained:", status)
 
 def _restart_cassandra_node():
